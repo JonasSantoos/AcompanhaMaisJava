@@ -9,8 +9,9 @@ public class Pessoa {
     private char sexo;
     private String telefone;
     private Endereco endereco;
+    private Long versao;
 
-    public Pessoa(String nome, String cpf, String dataNascimento, char sexo, String telefone, Endereco endereco) {
+    public Pessoa(String nome, String cpf, String dataNascimento, char sexo, String telefone, Endereco endereco, Long versao) {
 
         this.nome = nome;
         setCpf(cpf);
@@ -18,6 +19,7 @@ public class Pessoa {
         setSexo(sexo);
         setTelefone(telefone);
         this.endereco = endereco;
+        this.versao = versao;
     }
 
     //seta cpf e verifica s eé válido
@@ -47,9 +49,9 @@ public class Pessoa {
     }
 
     //Métod para verificar se o sexo é válido
-    private void isSexoValido(){
-        if(!(this.sexo != 'M') && !(this.sexo != 'F')){
-            throw new ValidacaoDominioException("Sexo inválido!");
+    private void isSexoValido() {
+        if (this.sexo != 'M' && this.sexo != 'F') {
+            throw new ValidacaoDominioException("Sexo inválido! Deve ser 'M' ou 'F'.");
         }
     }
 
@@ -63,6 +65,8 @@ public class Pessoa {
     public String getNome() {
         return nome;
     }
+
+
 
     public String getCpf() {
         return cpf;
@@ -82,5 +86,9 @@ public class Pessoa {
 
     public Endereco getEndereco() {
         return endereco;
+    }
+
+    public Long getVersao() {
+        return versao;
     }
 }

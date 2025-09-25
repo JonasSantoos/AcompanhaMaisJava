@@ -4,6 +4,7 @@ import br.com.fiap.acompanha.domain.exceptions.EntidadeNaoLocalizada;
 import br.com.fiap.acompanha.domain.model.Cuidador;
 import br.com.fiap.acompanha.domain.model.Endereco;
 import br.com.fiap.acompanha.domain.repository.CuidadorRepository;
+import br.com.fiap.acompanha.domain.repository.EnderecoRepository;
 import br.com.fiap.acompanha.infrastructure.exceptions.InfraestruturaException;
 
 import java.sql.Connection;
@@ -23,10 +24,13 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
         @Override
         public Cuidador adicionar(Cuidador cuidador) {
 
+
+            Endereco enderecoParaSalvar = cuidador.getEndereco();
+            long idDoEnderecoSalvo = JdbcEnderecoRepository();
+
             String sql = """
-                    INSERT INTO CUIDADOR (NOME, CPF, DATANASCIMENTO, SEXO, TELEFONE, EMAIL, SENHA, VERSION,
-                    CEP, RUA, NUMERO, COMPLEMENTO, BAIRRO, ESTADO, CIDADE)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    INSERT INTO CUIDADOR (NOME, CPF, DATANASCIMENTO, SEXO, TELEFONE, EMAIL, SENHA, ID_ENDERECO, VERSION)
+                    VALUES (?,?,?,?,?,?,?,?,?)
                     """;
 
             try (Connection conn = this.databaseConnection.getConnection();
@@ -39,18 +43,8 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
                 stmt.setString(5, cuidador.getTelefone());
                 stmt.setString(6, cuidador.getEmail());
                 stmt.setString(7, cuidador.getSenha());
-                stmt.setLong(8, cuidador.getVersao());
-
-
-                stmt.setString(9, cuidador.getEndereco().getCep());
-                stmt.setString(10, cuidador.getEndereco().getRua());
-                stmt.setString(11, cuidador.getEndereco().getNumero());
-                stmt.setString(12, cuidador.getEndereco().getComplemento());
-                stmt.setString(13, cuidador.getEndereco().getBairro());
-                stmt.setString(14, cuidador.getEndereco().getEstado());
-                stmt.setString(15, cuidador.getEndereco().getCidade());
-
-
+                stmt.setLong(8, );
+                stmt.setLong(9, cuidador.getVersao());
 
                 int affectedRows = stmt.executeUpdate();
                 if (affectedRows == 0) {

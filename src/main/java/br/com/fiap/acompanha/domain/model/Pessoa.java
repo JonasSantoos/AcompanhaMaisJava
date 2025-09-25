@@ -1,8 +1,9 @@
 package br.com.fiap.acompanha.domain.model;
 
 import br.com.fiap.acompanha.domain.exceptions.ValidacaoDominioException;
-public class Pessoa {
+public abstract class Pessoa {
 
+    private Long idPessoa;
     private String nome;
     private String cpf;
     private String dataNascimento;
@@ -11,8 +12,9 @@ public class Pessoa {
     private Endereco endereco;
     private Long versao;
 
-    public Pessoa(String nome, String cpf, String dataNascimento, char sexo, String telefone, Endereco endereco, Long versao) {
+    public Pessoa(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, Endereco endereco, Long versao) {
 
+        this.idPessoa = idPessoa;
         this.nome = nome;
         setCpf(cpf);
         this.dataNascimento = dataNascimento;
@@ -67,6 +69,9 @@ public class Pessoa {
     }
 
 
+    public Long getIdPessoa() {
+        return idPessoa;
+    }
 
     public String getCpf() {
         return cpf;

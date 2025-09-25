@@ -3,29 +3,30 @@ package br.com.fiap.acompanha.infrastructure.persistence;
 import br.com.fiap.acompanha.domain.model.Endereco;
 import br.com.fiap.acompanha.domain.repository.EnderecoRepository;
 import br.com.fiap.acompanha.infrastructure.exceptions.InfraestruturaException;
+import br.com.fiap.acompanha.infrastructure.persistence.DatabaseConnection;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class JdbcEnderecoRepository implements EnderecoRepository {
 
-
     private final DatabaseConnection databaseConnection;
 
-    public JdbcEnderecoRepository(DatabaseConnection databaseConnection){
+    public JdbcEnderecoRepository(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
     }
 
-
     @Override
-    public long obterIdEndereco (Endereco endereco) {
+    public long obterIdEndereco(Endereco endereco) {
         String sql = """
-        INSERT INTO ENDERECO (CEP, RUA, NUMERO, COMPLEMENTO, BAIRRO, ESTADO, CIDADE)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """;
+                INSERT INTO ENDERECO (CEP, RUA, NUMERO, COMPLEMENTO, BAIRRO, ESTADO, CIDADE)
+                VALUES (?,?,?,?,?,?,?)
+                """;
 
-        try (Connection conn = this.databaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, endereco.getCep());
             stmt.setString(2, endereco.getRua());
@@ -35,27 +36,18 @@ public class JdbcEnderecoRepository implements EnderecoRepository {
             stmt.setString(6, endereco.getEstado());
             stmt.setString(7, endereco.getCidade());
 
+            stmt.executeUpdate();
 
-            int linhasAfetadas = stmt.executeUpdate();
-
-            if (linhasAfetadas == 0) {
-                throw new SQLException("A inserção do endereço falhou, nenhuma linha foi afetada.");
-            }
-
-            try (ResultSet chavesGeradas = stmt.getGeneratedKeys()) {
-
-                if (chavesGeradas.next()) {
-
-                    return chavesGeradas.getLong(1);
-                } else {
-                    throw new SQLException("A inserção do endereço falhou, nenhum ID foi retornado.");
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
                 }
             }
 
-        } catch (SQLException e) {
+            throw new InfraestruturaException("Não foi possível recuperar o ID do endereço");
 
-            throw new InfraestruturaException("Erro ao salvar endereço e obter ID.", e);
+        } catch (SQLException e) {
+            throw new InfraestruturaException("Erro ao salvar endereço", e);
         }
     }
-
 }

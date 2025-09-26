@@ -7,7 +7,7 @@ import java.util.List;
 public interface PacienteRepository {
 
     Paciente buscarPorCpf(String cpf);
-    Paciente excluir(String cpf, Long versao);
+    Paciente excluirPaciente(String cpf, Long versao);
     List<Paciente> buscarTodos();
 
 }

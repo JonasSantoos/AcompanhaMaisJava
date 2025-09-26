@@ -9,10 +9,11 @@ public abstract class Pessoa {
     private String dataNascimento;
     private char sexo;
     private String telefone;
-    private Endereco endereco;
+    private String endereco;
     private Long versao;
+    
 
-    public Pessoa(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, Endereco endereco, Long versao) {
+    public Pessoa(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, String endereco, Long versao) {
 
         this.idPessoa = idPessoa;
         this.nome = nome;

@@ -11,7 +11,7 @@ public class Hospital {
     private Endereco endereco;
     private Long versao;
 
-    public Hospital(Long id, String nome, String cnpj, String emailCorporativo, Endereco endereco, Long versao) {
+    public Hospital(Long id, String nome, String cnpj, String emailCorporativo, String endereco, Long versao) {
         this.id = id;
         this.nome = nome;
         setCnpj(cnpj);

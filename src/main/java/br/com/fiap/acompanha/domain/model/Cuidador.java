@@ -5,7 +5,7 @@ public class Cuidador extends Pessoa{
     private String email;
     private String senha;
 
-    public Cuidador(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, Long endereco, String email, String senha, Long versao) {
+    public Cuidador(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, String endereco, String email, String senha, Long versao) {
         super(idPessoa, nome, cpf, dataNascimento, sexo, telefone, endereco, versao);
         this.email = email;
         this.senha = senha;

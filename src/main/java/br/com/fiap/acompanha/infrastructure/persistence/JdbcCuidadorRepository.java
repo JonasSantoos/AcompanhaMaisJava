@@ -2,9 +2,7 @@ package br.com.fiap.acompanha.infrastructure.persistence;
 
 import br.com.fiap.acompanha.domain.exceptions.EntidadeNaoLocalizada;
 import br.com.fiap.acompanha.domain.model.Cuidador;
-import br.com.fiap.acompanha.domain.model.Endereco;
 import br.com.fiap.acompanha.domain.repository.CuidadorRepository;
-import br.com.fiap.acompanha.domain.repository.EnderecoRepository;
 import br.com.fiap.acompanha.infrastructure.exceptions.InfraestruturaException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,18 +13,13 @@ import java.util.List;
 public class JdbcCuidadorRepository implements CuidadorRepository{
 
     private final DatabaseConnection databaseConnection;
-    private final EnderecoRepository enderecoRepository;
 
-    public JdbcCuidadorRepository(DatabaseConnection databaseConnection, EnderecoRepository enderecoRepository) {
+    public JdbcCuidadorRepository(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
-        this.enderecoRepository = enderecoRepository;
     }
 
     @Override
     public Cuidador adicionar(Cuidador cuidador) {
-
-        Endereco enderecoParaSalvar = cuidador.getEndereco();
-        long idDoEnderecoSalvo = enderecoRepository.obterIdEndereco(enderecoParaSalvar);
 
         String sql = """
                 INSERT INTO ACPH_CUIDADOR 
@@ -46,7 +39,7 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
             stmt.setString(6, cuidador.getTelefone());
             stmt.setString(7, cuidador.getEmail());
             stmt.setString(8, cuidador.getSenha());
-            stmt.setLong(9, idDoEnderecoSalvo);
+            stmt.setLong(9, cuidador.getEndereco());
             stmt.setLong(10, cuidador.getVersao());
 
             int affectedRows = stmt.executeUpdate();
@@ -84,7 +77,7 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
                 String telefone = resultSet.getString("tel_cuidador");
                 String email = resultSet.getString("email_cuidador");
                 String senha = resultSet.getString("senha_cuidador");
-                Long idEndereco = resultSet.getLong("id_endereco");
+                Long idEndereco = resultSet.getString("id_endereco");
                 Long versao = resultSet.getLong("VERSION");
 
                 Endereco endereco = null;
@@ -161,11 +154,11 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
                 String telefone = rs.getString("tel_cuidador");
                 String email = rs.getString("email_cuidador");
                 String senha = rs.getString("senha_cuidador");
-                Long idEndereco = rs.getLong("id_endereco");
+                String endereco = rs.getLong("id_endereco");
                 Long versao = rs.getLong("VERSION");
 
                 cuidadores.add(new Cuidador(idPessoa, nome, cpf, dataNascimento, sexo, telefone,
-                        idEndereco, email, senha, versao));
+                        endereco, email, senha, versao));
             }
 
             return cuidadores;
@@ -177,6 +170,24 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
     }
 
 @Override
-public Cuidador excluirCuidador(String cpf, Long versao){
-    return null;
+public Cuidador excluirCuidador(String cpf, Long versao) {
+
+    String sql = "DELETE FROM ACPH_CUIDADOR WHERE cpf_cuidador = ? AND VERSION = ?";
+
+    try (Connection conn = this.databaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setString(1, cpf);
+        stmt.setLong(2, versao);
+
+        int affectedRows = stmt.executeUpdate();
+        if (affectedRows == 0) {
+            throw new InfraestruturaException("Erro ao excluir, nenhuma linha do banco foi afetada");
+        }
+
+        return null;
+
+    } catch (SQLException e) {
+        throw new InfraestruturaException("Erro ao excluir cuidador", e);
+    }
 }

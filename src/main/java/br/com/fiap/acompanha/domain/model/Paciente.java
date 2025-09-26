@@ -4,7 +4,7 @@ public class Paciente extends Pessoa{
 
     private String especialidadeAtendimento;
 
-    public Paciente(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, Endereco endereco, String especialidadeAtendimento, Long versao) {
+    public Paciente(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, String endereco, String especialidadeAtendimento, Long versao) {
 
         super(idPessoa, nome, cpf, dataNascimento, sexo, telefone, endereco, versao);
 

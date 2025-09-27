@@ -1,8 +1,6 @@
 package br.com.fiap.acompanha.domain.repository;
-
 import br.com.fiap.acompanha.domain.exceptions.EntidadeNaoLocalizada;
 import br.com.fiap.acompanha.domain.model.Cuidador;
-
 import java.util.List;
 
 public interface CuidadorRepository {

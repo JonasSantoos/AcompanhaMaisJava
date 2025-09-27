@@ -1,6 +1,10 @@
 package br.com.fiap.acompanha.infrastructure.persistence;
 
+import br.com.fiap.acompanha.domain.exceptions.EntidadeNaoLocalizada;
+import br.com.fiap.acompanha.domain.model.Paciente;
 import br.com.fiap.acompanha.domain.repository.PacienteRepository;
+
+import java.util.List;
 
 public class JdbcPacienteRepository implements PacienteRepository {
 
@@ -11,7 +15,7 @@ public class JdbcPacienteRepository implements PacienteRepository {
     }
 
     @Override
-    public Paciente buscarPorCpf(String cpf) throws EntidadeNaoLocalizada{
+    public Paciente buscarPorCpf(String cpf) {
         return null;
     }
 

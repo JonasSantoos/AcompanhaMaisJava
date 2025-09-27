@@ -69,6 +69,9 @@ public abstract class Pessoa {
         return nome;
     }
 
+    public String getEndereco() {
+        return endereco;
+    }
 
     public Long getIdPessoa() {
         return idPessoa;
@@ -88,10 +91,6 @@ public abstract class Pessoa {
 
     public String getTelefone() {
         return telefone;
-    }
-
-    public Endereco getEndereco() {
-        return endereco;
     }
 
     public Long getVersao() {

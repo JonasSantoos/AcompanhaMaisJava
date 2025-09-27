@@ -7,16 +7,16 @@ public class Hospital {
     private Long id;
     private String nome;
     private String cnpj;
+    private String endereco;
     private String emailCorporativo;
-    private Endereco endereco;
     private Long versao;
 
-    public Hospital(Long id, String nome, String cnpj, String emailCorporativo, String endereco, Long versao) {
+    public Hospital(Long id, String nome, String cnpj, String endereco, String emailCorporativo, Long versao) {
         this.id = id;
         this.nome = nome;
         setCnpj(cnpj);
-        this.emailCorporativo = emailCorporativo;
         this.endereco = endereco;
+        this.emailCorporativo = emailCorporativo;
         this.versao = versao;
     }
 
@@ -49,10 +49,6 @@ public class Hospital {
 
     public String getEmailCorporativo() {
         return emailCorporativo;
-    }
-
-    public Endereco getEndereco() {
-        return endereco;
     }
 
     public Long getVersao() {

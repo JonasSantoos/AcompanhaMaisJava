@@ -22,4 +22,6 @@ public class Cuidador extends Pessoa{
 
     public void setVersao(long l) {
     }
+
+
 }

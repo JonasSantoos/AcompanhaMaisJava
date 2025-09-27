@@ -8,8 +8,6 @@ public interface CuidadorRepository {
     Cuidador adicionar(Cuidador cuidador);
     Cuidador buscarPorCpf(String cpf) throws EntidadeNaoLocalizada;
     Cuidador editar(Cuidador cuidador);
-
     List<Cuidador> buscarTodos();
-
     Cuidador excluirCuidador(String cpf, Long versao);
 }

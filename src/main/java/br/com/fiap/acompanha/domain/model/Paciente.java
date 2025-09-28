@@ -12,8 +12,12 @@ public class Paciente extends Pessoa{
         this.especialidadeAtendimento = especialidadeAtendimento;
     }
 
-
     public String getEspecialidadeAtendimento() {
         return especialidadeAtendimento;
     }
+
+    public void setEspecialidadeAtendimento(String especialidadeAtendimento) {
+        this.especialidadeAtendimento = especialidadeAtendimento;
+    }
 }
+

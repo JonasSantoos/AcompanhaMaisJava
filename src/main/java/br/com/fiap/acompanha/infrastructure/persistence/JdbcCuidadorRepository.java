@@ -23,7 +23,7 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
         String sql = """
                 INSERT INTO ACPH_CUIDADOR
                 (id_cuidador, nm_cuidador, sexo_cuidador, cpf_cuidador, dt_nascimento_cuidador,
-                 tel_cuidador, email_cuidador, senha_cuidador, id_endereco ,VERSION)
+                 tel_cuidador, email_cuidador, senha_cuidador,VERSION)
                 VALUES (?,?,?,?,?,?,?,?,?,?)
                 """;
 
@@ -38,13 +38,7 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
             stmt.setString(6, cuidador.getTelefone());
             stmt.setString(7, cuidador.getEmail());
             stmt.setString(8, cuidador.getSenha());
-            stmt.setString(9, cuidador.getEndereco());
-            stmt.setLong(10, cuidador.getVersao());
-
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new InfraestruturaException("Erro ao salvar, nenhuma linha do banco foi afetada");
-            }
+            stmt.setLong(9, cuidador.getVersao());
 
             return cuidador;
 
@@ -132,8 +126,8 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
     @Override
     public List<Cuidador> buscarTodos() {
 
-        String sql = "SELECT id_cuidador, nm_cuidador, cpf_cuidador, dt_nascimento_cuidador, " +
-                "sexo_cuidador, tel_cuidador, email_cuidador, senha_cuidador, id_endereco, VERSION " +
+        String sql = "SELECT ID_CUIDADOR, NM_CUIDADOR, SEXO_CUIDADOR, CPF_CUIDADOR, " +
+                "DT_NASCIMENTO_CUIDADOR, TEL_CUIDADOR, EMAIL_CUIDADOR, SENHA_CUIDADOR, VERSION " +
                 "FROM ACPH_CUIDADOR";
 
         try (Connection conn = databaseConnection.getConnection();
@@ -151,11 +145,10 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
                 String telefone = rs.getString("tel_cuidador");
                 String email = rs.getString("email_cuidador");
                 String senha = rs.getString("senha_cuidador");
-                String endereco = rs.getString("id_endereco");
                 Long versao = rs.getLong("VERSION");
 
                 cuidadores.add(new Cuidador(idPessoa, nome, cpf, dataNascimento, sexo, telefone,
-                        endereco, email, senha, versao));
+                        email, senha, versao));
             }
 
             return cuidadores;
@@ -189,4 +182,3 @@ public class JdbcCuidadorRepository implements CuidadorRepository{
 
     }
 }
-

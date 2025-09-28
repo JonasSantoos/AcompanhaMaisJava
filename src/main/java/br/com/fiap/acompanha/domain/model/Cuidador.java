@@ -11,16 +11,28 @@ public class Cuidador extends Pessoa{
         this.senha = senha;
     }
 
+    public Cuidador(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, String email, String senha, Long versao) {
+        super(idPessoa, nome, cpf, dataNascimento, sexo, telefone, versao);
+        this.email = email;
+        this.senha = senha;
+    }
+
+
 
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getSenha() {
         return senha;
     }
 
-    public void setVersao(long l) {
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
-
 }
+

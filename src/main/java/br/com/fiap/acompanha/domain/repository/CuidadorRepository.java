@@ -10,4 +10,5 @@ public interface CuidadorRepository {
     Cuidador editar(Cuidador cuidador);
     List<Cuidador> buscarTodos();
     Cuidador excluirCuidador(String cpf, Long versao);
+
 }

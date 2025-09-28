@@ -7,6 +7,6 @@ public class EntidadeNaoLocalizada extends Exception {
     }
 
     public EntidadeNaoLocalizada(String message, Throwable cause){
-      super(message, cause);
+        super(message, cause);
     }
 }

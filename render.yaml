@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: AcompanhaMais
+    env: docker
+    plan: free
+    autoDeploy: true
+    
+    previewDeploys:
+      enabled: true
+
+    dockerfilePath: ./Dockerfile

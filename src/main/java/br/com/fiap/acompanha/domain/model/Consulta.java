@@ -29,7 +29,7 @@ public class Consulta {
 
     public Date getDataConsulta() { return dataConsulta; }
     public void setDataConsulta(Date dataConsulta) { this.dataConsulta = dataConsulta; }
-    
+
     public String getHorarioConsultaString() { return horarioConsultaString; }
     public void setHorarioConsultaString(String horarioConsultaString) {
         this.horarioConsultaString = horarioConsultaString;

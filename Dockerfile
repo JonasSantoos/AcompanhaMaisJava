@@ -2,9 +2,9 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy Maven files - CORRIGIDO: da raiz
+# Copy Maven files
 COPY pom.xml .
-COPY src src
+COPY src ./src
 
 # Build the application
 RUN mvn clean package -DskipTests
@@ -13,11 +13,8 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /work
 
-# Copy from the correct path - CORRIGIDO: da raiz
-COPY --from=build /app/target/quarkus-app/lib/ /work/lib/
-COPY --from=build /app/target/quarkus-app/*.jar /work/
-COPY --from=build /app/target/quarkus-app/app/ /work/app/
-COPY --from=build /app/target/quarkus-app/quarkus/ /work/quarkus/
+# Copy the Quarkus application - CORREÇÃO AQUI
+COPY --from=build /app/target/quarkus-app/ /work/
 
 EXPOSE 8080
 

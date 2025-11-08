@@ -1,24 +1,19 @@
-# Stage 1: Build the application
+# Etapa de build
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy everything at once
-COPY . .
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Build the application using the pre-installed Maven
+COPY src ./src
+
 RUN mvn clean package -DskipTests
 
-# Stage 2: Create the runtime image
+
+# Etapa final
 FROM eclipse-temurin:21-jre
-WORKDIR /work
+WORKDIR /app
 
-# Copy the entire quarkus-app directory structure
-COPY --from=build /app/target/quarkus-app/lib/ /work/lib/
-COPY --from=build /app/target/quarkus-app/*.jar /work/
-COPY --from=build /app/target/quarkus-app/app/ /work/app/
-COPY --from=build /app/target/quarkus-app/quarkus/ /work/quarkus/
+COPY --from=build /app/target/*-runner.jar app.jar
 
-EXPOSE 8080
-
-# Run the application
-ENTRYPOINT ["java", "-jar", "/work/quarkus-run.jar"]
+CMD ["java", "-jar", "app.jar"]

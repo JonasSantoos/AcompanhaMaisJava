@@ -1,39 +1,34 @@
 package br.com.fiap.acompanha.infrastructure.config;
 
-import br.com.fiap.acompanha.domain.repository.CuidadorRepository;
-import br.com.fiap.acompanha.domain.repository.HospitalRepository;
-import br.com.fiap.acompanha.domain.repository.PacienteRepository;
-
-import br.com.fiap.acompanha.infrastructure.persistence.JdbcCuidadorRepository;
-import br.com.fiap.acompanha.infrastructure.persistence.JdbcHospitalRepository;
-import br.com.fiap.acompanha.infrastructure.persistence.JdbcPacienteRepository;
-
+import br.com.fiap.acompanha.domain.repository.*;
 import br.com.fiap.acompanha.infrastructure.persistence.*;
 import io.agroal.api.AgroalDataSource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class DatabaseConfig {
 
+    @Produces
     @ApplicationScoped
     public DatabaseConnection databaseConnection(AgroalDataSource dataSource) {
+        System.out.println("Criando DatabaseConnection...");
         return new DatabaseConnectionImpl(dataSource);
     }
 
+    @Produces
     @ApplicationScoped
     public PacienteRepository pacienteRepository(DatabaseConnection databaseConnection) {
+        System.out.println("Criando PacienteRepository...");
         return new JdbcPacienteRepository(databaseConnection);
     }
 
 
+    @Produces
     @ApplicationScoped
-    public HospitalRepository hospitalRepository(DatabaseConnection databaseConnection) {
-        return new JdbcHospitalRepository(databaseConnection);
-    }
-
-    @ApplicationScoped
-    public CuidadorRepository CuidadorRepository(DatabaseConnection databaseConnection) {
+    public CuidadorRepository cuidadorRepository(DatabaseConnection databaseConnection) {
+        System.out.println("Criando CuidadorRepository...");
         return new JdbcCuidadorRepository(databaseConnection);
     }
-
 }

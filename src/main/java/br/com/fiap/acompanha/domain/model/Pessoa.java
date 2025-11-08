@@ -1,23 +1,25 @@
 package br.com.fiap.acompanha.domain.model;
 
 import br.com.fiap.acompanha.domain.exceptions.ValidacaoDominioException;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Collection;
+import java.util.Date;
 
 public abstract class Pessoa {
 
     private Long idPessoa;
     private String nome;
     private String cpf;
-    private String dataNascimento;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private Date dataNascimento;
+
     private char sexo;
     private String telefone;
     private String endereco;
     private Long versao;
-    
 
-    public Pessoa(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, String endereco, Long versao) {
-
+    public Pessoa(Long idPessoa, String nome, String cpf, Date dataNascimento, char sexo, String telefone, String endereco, Long versao) {
         this.idPessoa = idPessoa;
         this.nome = nome;
         setCpf(cpf);
@@ -28,8 +30,7 @@ public abstract class Pessoa {
         this.versao = versao;
     }
 
-    public Pessoa(Long idPessoa, String nome, String cpf, String dataNascimento, char sexo, String telefone, Long versao) {
-
+    public Pessoa(Long idPessoa, String nome, String cpf, Date dataNascimento, char sexo, String telefone, Long versao) {
         this.idPessoa = idPessoa;
         this.nome = nome;
         setCpf(cpf);
@@ -39,47 +40,40 @@ public abstract class Pessoa {
         this.versao = versao;
     }
 
+    public Pessoa() {}
 
-    //seta cpf e verifica s eé válido
-    private void setCpf(String cpf){
+    public void setCpf(String cpf){
         this.cpf = cpf;
         isCpfValido();
     }
 
-    //seta sexo e verifica s eé válido
-    private void setSexo(char sexo){
+    public void setSexo(char sexo){
         this.sexo = sexo;
         isSexoValido();
     }
 
-    //seta telefone e verifica s eé válido
-    private void setTelefone(String telefone){
+    public void setTelefone(String telefone){
         this.telefone = telefone;
         isTelefoneValido();
     }
 
-
-    //Métod para verificar se CPF é válido
     private void isCpfValido(){
         if(!this.cpf.matches("\\d{11}")){
             throw new ValidacaoDominioException("CPF inválido!");
         }
     }
 
-    //Métod para verificar se o sexo é válido
     private void isSexoValido() {
         if (this.sexo != 'M' && this.sexo != 'F') {
             throw new ValidacaoDominioException("Sexo inválido! Deve ser 'M' ou 'F'.");
         }
     }
 
-    //Métod para verificar se o telefone possui todos dígitos
     private void isTelefoneValido(){
         if(!this.telefone.matches("\\d{11}")){
             throw new ValidacaoDominioException("Telefone inválido!");
         }
     }
-
 
     public String getNome() {
         return nome;
@@ -97,7 +91,7 @@ public abstract class Pessoa {
         return cpf;
     }
 
-    public String getDataNascimento() {
+    public Date getDataNascimento() {
         return dataNascimento;
     }
 
@@ -113,10 +107,23 @@ public abstract class Pessoa {
         return versao;
     }
 
-    public void setVersao(long l) {
-
+    public void setIdPessoa(Long idPessoa) {
+        this.idPessoa = idPessoa;
     }
 
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
+    public void setDataNascimento(Date dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
 
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
+    }
+
+    public void setVersao(Long versao) {
+        this.versao = versao;
+    }
 }

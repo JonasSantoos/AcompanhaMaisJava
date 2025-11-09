@@ -200,7 +200,6 @@ public class JdbcPacienteRepository implements PacienteRepository {
             stmt.setString(4, paciente.getTelefone());
             stmt.setString(5, paciente.getEspecialidadeAtendimento());
 
-            // ID do cuidador (pode ser NULL se não tiver cuidador)
             if (paciente.getCuidador() != null) {
                 stmt.setLong(6, paciente.getCuidador().getIdPessoa());
             } else {

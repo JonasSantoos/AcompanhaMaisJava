@@ -35,20 +35,14 @@ public class CuidadorController {
 
             if (cuidador != null && cuidador.getSenha().equals(senha)) {
                 Cuidador cuidadorCompleto = cuidadorService.buscarPorCpf(cuidador.getCpf());
-                return Response.ok(cuidadorCompleto).build();
+                return Response.status(Response.Status.OK).entity("{\"message\": \"Login realizado com sucesso\"}").build();
             } else {
-                return Response.status(Response.Status.UNAUTHORIZED)
-                        .entity("{\"error\": \"Email ou senha inválidos\"}")
-                        .build();
+                return Response.status(Response.Status.UNAUTHORIZED).entity("{\"error\": \"Email ou senha inválidos\"}").build();
             }
         } catch (EntidadeNaoLocalizada e) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("{\"error\": \"Email ou senha inválidos\"}")
-                    .build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity("{\"error\": \"Email ou senha inválidos\"}").build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Erro ao fazer login\"}")
-                    .build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"Erro ao fazer login\"}").build();
         }
     }
 
@@ -77,9 +71,7 @@ public class CuidadorController {
             return Response.ok(dtos).build();
 
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Erro ao listar cuidadores\"}")
-                    .build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"Erro ao listar cuidadores\"}").build();
         }
     }
 
@@ -100,7 +92,7 @@ public class CuidadorController {
     @Path("/{cpf}")
     public Response deletar(@PathParam("cpf") String cpf) throws EntidadeNaoLocalizada {
         cuidadorService.deletarCuidador(cpf);
-        return Response.noContent().build();
+        return Response.status(Response.Status.OK).entity("{\"message\": \"Cuidador removido com sucesso.\"}").build();
     }
 
     @POST
@@ -118,13 +110,9 @@ public class CuidadorController {
         try {
             Cuidador cuidador = cuidadorService.buscarPorCpf(cpf);
             cuidador.setSenha(novaSenha);
-            Cuidador atualizado = cuidadorService.atualizar(cuidador);
-            Cuidador confirmacao = cuidadorService.buscarPorCpf(cpf);
-            return Response.ok(confirmacao).build();
+            return Response.status(Response.Status.OK).entity("{\"message\": \"Senha alterada com sucesso!\"}").build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Erro ao atualizar senha\"}")
-                    .build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\": \"Erro ao atualizar senha\"}").build();
         }
     }
 }

@@ -105,10 +105,8 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
     private Consulta mapearConsultaCompleta(ResultSet resultSet) throws SQLException {
         Long idConsulta = resultSet.getLong("ID_CONSULTA");
 
-        // Data da consulta
         Date dataConsulta = resultSet.getDate("DT_CONSULTA");
 
-        // ⭐⭐ AGORA FUNCIONA! Extrair só a hora do TIMESTAMP ⭐⭐
         Timestamp horarioTimestamp = resultSet.getTimestamp("HORARIO_CONSULTA");
         String horaFormatada = "N/A";
 

@@ -104,7 +104,6 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
                         telefone, endereco, email, senha, versao
                 );
 
-                // CARREGA OS PACIENTES VINCULADOS
                 List<Paciente> pacientes = buscarPacientesPorCuidador(idPessoa);
                 cuidador.setPacientes(pacientes);
 

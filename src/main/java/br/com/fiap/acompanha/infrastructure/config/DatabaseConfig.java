@@ -5,7 +5,7 @@ import br.com.fiap.acompanha.infrastructure.persistence.*;
 import io.agroal.api.AgroalDataSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Inject;
+
 
 @ApplicationScoped
 public class DatabaseConfig {

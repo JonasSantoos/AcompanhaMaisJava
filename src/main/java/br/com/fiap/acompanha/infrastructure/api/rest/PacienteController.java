@@ -49,7 +49,7 @@ public class PacienteController {
     @Path("/{cpf}")
     public Response deletar(@PathParam("cpf") String cpf) throws EntidadeNaoLocalizada {
         pacienteService.excluirPaciente(cpf);
-        return Response.noContent().build();
+        return Response.status(Response.Status.OK).entity("{\"message\": \"Paciente deletado com sucesso\"}").build();
     }
 
     @GET

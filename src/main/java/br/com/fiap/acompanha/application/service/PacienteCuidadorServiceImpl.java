@@ -32,7 +32,7 @@ public class PacienteCuidadorServiceImpl implements PacienteCuidadorService {
             if (!cuidador.getPacientes().contains(paciente)) {
                 cuidador.getPacientes().add(paciente);
                 paciente.setCuidador(cuidador);
-                cuidadorRepository.editar(cuidador); // garante persistência
+                cuidadorRepository.editar(cuidador);
             }
 
         } catch (EntidadeNaoLocalizada e) {

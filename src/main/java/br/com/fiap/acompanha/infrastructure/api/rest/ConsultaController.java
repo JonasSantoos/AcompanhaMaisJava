@@ -1,4 +1,3 @@
-// src/main/java/br/com/fiap/acompanha/infrastructure/api/rest/ConsultaController.java
 package br.com.fiap.acompanha.infrastructure.api.rest;
 
 import br.com.fiap.acompanha.domain.model.Consulta;
@@ -26,7 +25,6 @@ public class ConsultaController {
         try {
             List<Consulta> consultas = consultaRepository.listarTodas();
 
-            // Gera a tabela formatada
             StringBuilder tabela = new StringBuilder();
             tabela.append("PACIENTE\tDATA\tHORA\tENDEREÇO\n");
 
@@ -36,16 +34,14 @@ public class ConsultaController {
                 String data = consulta.getDataConsulta() != null ?
                         dateFormat.format(consulta.getDataConsulta()) : "N/A";
 
-                // ⭐⭐ CORREÇÃO: Use horarioConsultaString que já é a hora formatada
                 String hora = consulta.getHorarioConsultaString() != null ?
                         consulta.getHorarioConsultaString() : "N/A";
 
-                // Endereço fixo por enquanto
                 String endereco = "Ruiz " + (consultas.indexOf(consulta) % 2 == 0 ? "XYZ" : "ABC");
 
                 tabela.append(consulta.getPaciente().getNome()).append("\t")
                         .append(data).append("\t")
-                        .append(hora).append("\t")  // ⭐⭐ Já vem formatado como "14:30"
+                        .append(hora).append("\t")
                         .append(endereco).append("\n");
             }
 

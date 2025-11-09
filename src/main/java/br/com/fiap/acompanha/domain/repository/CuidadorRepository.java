@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CuidadorRepository {
 
-    Cuidador criar(Cuidador cuidador); // Já cria com endereço internamente
+    Cuidador criar(Cuidador cuidador);
     Cuidador buscarPorId(Long id) throws EntidadeNaoLocalizada;
     Cuidador buscarPorCpf(String cpf) throws EntidadeNaoLocalizada;
     Cuidador editar(Cuidador cuidador);

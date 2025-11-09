@@ -73,6 +73,7 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
     @Override
     public List<Consulta> listarPorCuidador(Long idCuidador) {
         String sql = """
+    SELECT * FROM (
         SELECT 
             c.ID_CONSULTA,
             c.DT_CONSULTA,
@@ -88,22 +89,25 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
             cu.CPF_CUIDADOR,
             cu.DT_NASCIMENTO_CUIDADOR,
             cu.SEXO_CUIDADOR,
-            -- Dados do endereço do paciente
             e.RUA,
             e.NUMERO,
             e.COMPLEMENTO,
             e.BAIRRO,
             e.CIDADE,
             e.ESTADO,
-            e.CEP
+            e.CEP,
+            -- Numera as linhas para cada consulta
+            ROW_NUMBER() OVER (PARTITION BY c.ID_CONSULTA ORDER BY e.ID_ENDERECO) as rn
         FROM ACPH_CONSULTA c
         INNER JOIN ACPH_PACIENTE p ON c.ACPH_PACIENTE_ID_PACIENTE = p.ID_PACIENTE
         INNER JOIN ACPH_CUIDADOR cu ON c.ACPH_CUIDADOR_ID_CUIDADOR = cu.ID_CUIDADOR
         LEFT JOIN ACPH_PACIENTE_ENDERECO pe ON p.ID_PACIENTE = pe.ACPH_PACIENTE_ID_PACIENTE
         LEFT JOIN ACPH_ENDERECO e ON pe.ACPH_ENDERECO_ID_ENDERECO = e.ID_ENDERECO
         WHERE cu.ID_CUIDADOR = ?
-        ORDER BY c.DT_CONSULTA, c.HORARIO_CONSULTA
-        """;
+    ) 
+    WHERE rn = 1  -- Pega apenas a primeira linha de cada consulta
+    ORDER BY DT_CONSULTA, HORARIO_CONSULTA
+    """;
 
         try (Connection conn = this.databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -126,7 +130,7 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
     }
 
     private Consulta mapearConsultaComEndereco(ResultSet resultSet) throws SQLException {
-        // Mapear dados básicos da consulta
+       
         Long idConsulta = resultSet.getLong("ID_CONSULTA");
         Date dataConsulta = resultSet.getDate("DT_CONSULTA");
 

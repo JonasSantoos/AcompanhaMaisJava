@@ -32,11 +32,23 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
                 c.STATUS_CONSULTA,
                 p.ID_PACIENTE,
                 p.NM_PACIENTE,
+                p.CPF_PACIENTE,
+                p.TEL_PACIENTE,
                 cu.ID_CUIDADOR,
-                cu.NM_CUIDADOR
+                cu.NM_CUIDADOR,
+                -- Dados do endereço do paciente
+                e.RUA,
+                e.NUMERO,
+                e.COMPLEMENTO,
+                e.BAIRRO,
+                e.CIDADE,
+                e.ESTADO,
+                e.CEP
             FROM ACPH_CONSULTA c
             INNER JOIN ACPH_PACIENTE p ON c.ACPH_PACIENTE_ID_PACIENTE = p.ID_PACIENTE
             INNER JOIN ACPH_CUIDADOR cu ON c.ACPH_CUIDADOR_ID_CUIDADOR = cu.ID_CUIDADOR
+            LEFT JOIN ACPH_PACIENTE_ENDERECO pe ON p.ID_PACIENTE = pe.ACPH_PACIENTE_ID_PACIENTE
+            LEFT JOIN ACPH_ENDERECO e ON pe.ACPH_ENDERECO_ID_ENDERECO = e.ID_ENDERECO
             ORDER BY c.DT_CONSULTA, c.HORARIO_CONSULTA
             """;
 
@@ -47,7 +59,7 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
             List<Consulta> consultas = new ArrayList<>();
 
             while (resultSet.next()) {
-                Consulta consulta = mapearConsultaCompleta(resultSet);
+                Consulta consulta = mapearConsultaComEndereco(resultSet);
                 consultas.add(consulta);
             }
 
@@ -70,14 +82,25 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
             p.ID_PACIENTE,
             p.NM_PACIENTE,
             p.CPF_PACIENTE,
+            p.TEL_PACIENTE,
             cu.ID_CUIDADOR,
             cu.NM_CUIDADOR,
             cu.CPF_CUIDADOR,
             cu.DT_NASCIMENTO_CUIDADOR,
-            cu.SEXO_CUIDADOR
+            cu.SEXO_CUIDADOR,
+            -- Dados do endereço do paciente
+            e.RUA,
+            e.NUMERO,
+            e.COMPLEMENTO,
+            e.BAIRRO,
+            e.CIDADE,
+            e.ESTADO,
+            e.CEP
         FROM ACPH_CONSULTA c
         INNER JOIN ACPH_PACIENTE p ON c.ACPH_PACIENTE_ID_PACIENTE = p.ID_PACIENTE
         INNER JOIN ACPH_CUIDADOR cu ON c.ACPH_CUIDADOR_ID_CUIDADOR = cu.ID_CUIDADOR
+        LEFT JOIN ACPH_PACIENTE_ENDERECO pe ON p.ID_PACIENTE = pe.ACPH_PACIENTE_ID_PACIENTE
+        LEFT JOIN ACPH_ENDERECO e ON pe.ACPH_ENDERECO_ID_ENDERECO = e.ID_ENDERECO
         WHERE cu.ID_CUIDADOR = ?
         ORDER BY c.DT_CONSULTA, c.HORARIO_CONSULTA
         """;
@@ -91,7 +114,7 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
             List<Consulta> consultas = new ArrayList<>();
 
             while (resultSet.next()) {
-                Consulta consulta = mapearConsultaCompleta(resultSet);
+                Consulta consulta = mapearConsultaComEndereco(resultSet);
                 consultas.add(consulta);
             }
 
@@ -102,14 +125,14 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
         }
     }
 
-    private Consulta mapearConsultaCompleta(ResultSet resultSet) throws SQLException {
+    private Consulta mapearConsultaComEndereco(ResultSet resultSet) throws SQLException {
+        // Mapear dados básicos da consulta
         Long idConsulta = resultSet.getLong("ID_CONSULTA");
-
         Date dataConsulta = resultSet.getDate("DT_CONSULTA");
 
+        // Formatar horário
         Timestamp horarioTimestamp = resultSet.getTimestamp("HORARIO_CONSULTA");
         String horaFormatada = "N/A";
-
         if (horarioTimestamp != null) {
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
             horaFormatada = timeFormat.format(new Date(horarioTimestamp.getTime()));
@@ -118,23 +141,40 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
         String tipoConsulta = resultSet.getString("TIPO_CONSULTA");
         String statusConsulta = resultSet.getString("STATUS_CONSULTA");
 
-
-        Long idPaciente = resultSet.getLong("ID_PACIENTE");
-        String nomePaciente = resultSet.getString("NM_PACIENTE");
-
+        // Mapear paciente com endereço
         Paciente paciente = new Paciente();
-        paciente.setIdPessoa(idPaciente);
-        paciente.setNome(nomePaciente);
+        paciente.setIdPessoa(resultSet.getLong("ID_PACIENTE"));
+        paciente.setNome(resultSet.getString("NM_PACIENTE"));
+        paciente.setCpf(resultSet.getString("CPF_PACIENTE"));
+        paciente.setTelefone(resultSet.getString("TEL_PACIENTE"));
 
+        // Construir e setar o endereço completo
+        String enderecoCompleto = construirEnderecoCompleto(resultSet);
+        paciente.setEndereco(enderecoCompleto);
 
-        Long idCuidador = resultSet.getLong("ID_CUIDADOR");
-        String nomeCuidador = resultSet.getString("NM_CUIDADOR");
-
+        // Mapear cuidador
         Cuidador cuidador = new Cuidador();
-        cuidador.setIdPessoa(idCuidador);
-        cuidador.setNome(nomeCuidador);
+        cuidador.setIdPessoa(resultSet.getLong("ID_CUIDADOR"));
+        cuidador.setNome(resultSet.getString("NM_CUIDADOR"));
 
+        // Adicionar dados extras se disponíveis (para listarPorCuidador)
+        try {
+            cuidador.setCpf(resultSet.getString("CPF_CUIDADOR"));
 
+            java.sql.Date dataNascimentoSql = resultSet.getDate("DT_NASCIMENTO_CUIDADOR");
+            if (dataNascimentoSql != null) {
+                cuidador.setDataNascimento(dataNascimentoSql.toLocalDate());
+            }
+
+            String sexoStr = resultSet.getString("SEXO_CUIDADOR");
+            if (sexoStr != null && !sexoStr.isEmpty()) {
+                cuidador.setSexo(sexoStr.charAt(0));
+            }
+        } catch (SQLException e) {
+            // Campos podem não estar presentes em todas as consultas
+        }
+
+        // Criar e retornar consulta
         Consulta consulta = new Consulta();
         consulta.setIdConsulta(idConsulta);
         consulta.setDataConsulta(dataConsulta);
@@ -145,5 +185,54 @@ public class JdbcConsultaRepository implements ConsultaRepository  {
         consulta.setPaciente(paciente);
 
         return consulta;
+    }
+
+    private String construirEnderecoCompleto(ResultSet resultSet) throws SQLException {
+        StringBuilder endereco = new StringBuilder();
+
+        String rua = resultSet.getString("RUA");
+        String numero = resultSet.getString("NUMERO");
+        String complemento = resultSet.getString("COMPLEMENTO");
+        String bairro = resultSet.getString("BAIRRO");
+        String cidade = resultSet.getString("CIDADE");
+        String estado = resultSet.getString("ESTADO");
+        String cep = resultSet.getString("CEP");
+
+        // Construir endereço formatado
+        if (rua != null && !rua.trim().isEmpty()) {
+            endereco.append(rua);
+            if (numero != null && !numero.trim().isEmpty()) {
+                endereco.append(", ").append(numero);
+            }
+            if (complemento != null && !complemento.trim().isEmpty()) {
+                endereco.append(" - ").append(complemento);
+            }
+        }
+
+        if (bairro != null && !bairro.trim().isEmpty()) {
+            if (endereco.length() > 0) endereco.append(" - ");
+            endereco.append(bairro);
+        }
+
+        if (cidade != null && !cidade.trim().isEmpty()) {
+            if (endereco.length() > 0) endereco.append(", ");
+            endereco.append(cidade);
+        }
+
+        if (estado != null && !estado.trim().isEmpty()) {
+            if (endereco.length() > 0) endereco.append("/");
+            endereco.append(estado);
+        }
+
+        if (cep != null && !cep.trim().isEmpty()) {
+            if (endereco.length() > 0) endereco.append(" - CEP: ");
+            endereco.append(cep);
+        }
+
+        return endereco.length() > 0 ? endereco.toString() : "Endereço não informado";
+    }
+
+    private Consulta mapearConsultaCompleta(ResultSet resultSet) throws SQLException {
+        return mapearConsultaComEndereco(resultSet);
     }
 }

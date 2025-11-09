@@ -690,11 +690,10 @@ WHERE c.email_cuidador = ?
             stmt.setString(4, cuidador.getCpf());
 
             if (cuidador.getDataNascimento() != null) {
-                cuidador.setDataNascimento(cuidador.getDataNascimento());
                 java.sql.Date sqlDate = java.sql.Date.valueOf(cuidador.getDataNascimento());
-                stmt.setDate(3, sqlDate);
+                stmt.setDate(5, sqlDate);
             } else {
-                stmt.setNull(3, java.sql.Types.DATE);
+                stmt.setNull(5, java.sql.Types.DATE);
             }
 
             stmt.setString(6, cuidador.getTelefone());

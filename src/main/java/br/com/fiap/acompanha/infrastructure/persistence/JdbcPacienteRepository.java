@@ -6,6 +6,7 @@ import br.com.fiap.acompanha.domain.repository.PacienteRepository;
 import br.com.fiap.acompanha.infrastructure.exceptions.InfraestruturaException;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,18 +21,18 @@ public class JdbcPacienteRepository implements PacienteRepository {
     @Override
     public List<Paciente> listarTodos() {
         String sql = """
-        SELECT
-            P.ID_PACIENTE, P.NM_PACIENTE, P.CPF_PACIENTE, P.DT_NASCIMENTO_PACIENTE,
-            P.SEXO_PACIENTE, P.TEL_PACIENTE, P.ESPECIALIDADE_ATENDIMENTO, P.VERSION,
-            E.RUA, E.NUMERO, E.COMPLEMENTO, E.BAIRRO, E.CIDADE, E.ESTADO, E.CEP
-        FROM
-            ACPH_PACIENTE P
-        LEFT JOIN
-            ACPH_PACIENTE_ENDERECO PE ON P.ID_PACIENTE = PE.ACPH_PACIENTE_ID_PACIENTE
-        LEFT JOIN
-            ACPH_ENDERECO E ON PE.ACPH_ENDERECO_ID_ENDERECO = E.ID_ENDERECO
-        ORDER BY P.ID_PACIENTE
-        """;
+    SELECT
+        P.ID_PACIENTE, P.NM_PACIENTE, P.CPF_PACIENTE, P.DT_NASCIMENTO_PACIENTE,
+        P.SEXO_PACIENTE, P.TEL_PACIENTE, P.ESPECIALIDADE_ATENDIMENTO, P.VERSION,
+        E.RUA, E.NUMERO, E.COMPLEMENTO, E.BAIRRO, E.CIDADE, E.ESTADO, E.CEP
+    FROM
+        ACPH_PACIENTE P
+    LEFT JOIN
+        ACPH_PACIENTE_ENDERECO PE ON P.ID_PACIENTE = PE.ACPH_PACIENTE_ID_PACIENTE
+    LEFT JOIN
+        ACPH_ENDERECO E ON PE.ACPH_ENDERECO_ID_ENDERECO = E.ID_ENDERECO
+    ORDER BY P.ID_PACIENTE
+    """;
 
         try (Connection conn = this.databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -45,7 +46,7 @@ public class JdbcPacienteRepository implements PacienteRepository {
                 Long idPessoa = resultSet.getLong("ID_PACIENTE");
                 String nome = resultSet.getString("NM_PACIENTE");
                 String cpf = resultSet.getString("CPF_PACIENTE");
-                Date dataNascimento = resultSet.getDate("DT_NASCIMENTO_PACIENTE");
+                java.sql.Date dataNascimento = resultSet.getDate("DT_NASCIMENTO_PACIENTE");
                 String sexoStr = resultSet.getString("SEXO_PACIENTE");
                 char sexo = (sexoStr != null && !sexoStr.isEmpty()) ? sexoStr.charAt(0) : ' ';
                 String telefone = resultSet.getString("TEL_PACIENTE");
@@ -54,8 +55,14 @@ public class JdbcPacienteRepository implements PacienteRepository {
 
                 String endereco = construirEnderecoCompleto(resultSet);
 
+                // CONVERTER java.sql.Date para LocalDate
+                LocalDate dataNascimentoLocalDate = null;
+                if (dataNascimento != null) {
+                    dataNascimentoLocalDate = dataNascimento.toLocalDate();
+                }
+
                 Paciente paciente = new Paciente(
-                        idPessoa, nome, cpf, dataNascimento, sexo, telefone,
+                        idPessoa, nome, cpf, dataNascimentoLocalDate, sexo, telefone,
                         endereco, especialidadeAtendimento, versao
                 );
 
@@ -72,19 +79,19 @@ public class JdbcPacienteRepository implements PacienteRepository {
     @Override
     public Paciente buscarPorCpf(String cpf) throws EntidadeNaoLocalizada {
         String sql = """
-        SELECT
-            P.ID_PACIENTE, P.NM_PACIENTE, P.CPF_PACIENTE, P.DT_NASCIMENTO_PACIENTE,
-            P.SEXO_PACIENTE, P.TEL_PACIENTE, P.ESPECIALIDADE_ATENDIMENTO, P.VERSION,
-            E.RUA, E.NUMERO, E.COMPLEMENTO, E.BAIRRO, E.CIDADE, E.ESTADO, E.CEP
-        FROM
-            ACPH_PACIENTE P
-        LEFT JOIN
-            ACPH_PACIENTE_ENDERECO PE ON P.ID_PACIENTE = PE.ACPH_PACIENTE_ID_PACIENTE
-        LEFT JOIN
-            ACPH_ENDERECO E ON PE.ACPH_ENDERECO_ID_ENDERECO = E.ID_ENDERECO
-        WHERE
-            P.CPF_PACIENTE = ?
-        """;
+    SELECT
+        P.ID_PACIENTE, P.NM_PACIENTE, P.CPF_PACIENTE, P.DT_NASCIMENTO_PACIENTE,
+        P.SEXO_PACIENTE, P.TEL_PACIENTE, P.ESPECIALIDADE_ATENDIMENTO, P.VERSION,
+        E.RUA, E.NUMERO, E.COMPLEMENTO, E.BAIRRO, E.CIDADE, E.ESTADO, E.CEP
+    FROM
+        ACPH_PACIENTE P
+    LEFT JOIN
+        ACPH_PACIENTE_ENDERECO PE ON P.ID_PACIENTE = PE.ACPH_PACIENTE_ID_PACIENTE
+    LEFT JOIN
+        ACPH_ENDERECO E ON PE.ACPH_ENDERECO_ID_ENDERECO = E.ID_ENDERECO
+    WHERE
+        P.CPF_PACIENTE = ?
+    """;
 
         try (Connection conn = this.databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -96,7 +103,7 @@ public class JdbcPacienteRepository implements PacienteRepository {
                 Long idPessoa = resultSet.getLong("ID_PACIENTE");
                 String nome = resultSet.getString("NM_PACIENTE");
                 String cpfFromDB = resultSet.getString("CPF_PACIENTE");
-                Date dataNascimento = resultSet.getDate("DT_NASCIMENTO_PACIENTE");
+                java.sql.Date dataNascimento = resultSet.getDate("DT_NASCIMENTO_PACIENTE");
                 String sexoStr = resultSet.getString("SEXO_PACIENTE");
                 char sexo = (sexoStr != null && !sexoStr.isEmpty()) ? sexoStr.charAt(0) : ' ';
                 String telefone = resultSet.getString("TEL_PACIENTE");
@@ -105,8 +112,13 @@ public class JdbcPacienteRepository implements PacienteRepository {
 
                 String endereco = construirEnderecoCompleto(resultSet);
 
+                LocalDate dataNascimentoLocalDate = null;
+                if (dataNascimento != null) {
+                    dataNascimentoLocalDate = dataNascimento.toLocalDate();
+                }
+
                 return new Paciente(
-                        idPessoa, nome, cpfFromDB, dataNascimento, sexo, telefone,
+                        idPessoa, nome, cpfFromDB, dataNascimentoLocalDate, sexo, telefone,
                         endereco, especialidadeAtendimento, versao
                 );
             }
@@ -190,8 +202,9 @@ public class JdbcPacienteRepository implements PacienteRepository {
             stmt.setString(2, String.valueOf(paciente.getSexo()));
 
             if (paciente.getDataNascimento() != null) {
-                java.util.Date utilDate = paciente.getDataNascimento();
-                java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+                paciente.setDataNascimento(paciente.getDataNascimento());
+
+                java.sql.Date sqlDate = java.sql.Date.valueOf(paciente.getDataNascimento());
                 stmt.setDate(3, sqlDate);
             } else {
                 stmt.setNull(3, java.sql.Types.DATE);
@@ -379,11 +392,11 @@ public class JdbcPacienteRepository implements PacienteRepository {
             stmt.setString(4, paciente.getCpf());
 
             if (paciente.getDataNascimento() != null) {
-                java.util.Date utilDate = paciente.getDataNascimento();
-                java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-                stmt.setDate(5, sqlDate);
+                paciente.setDataNascimento(paciente.getDataNascimento());
+                java.sql.Date sqlDate = java.sql.Date.valueOf(paciente.getDataNascimento());
+                stmt.setDate(3, sqlDate);
             } else {
-                stmt.setNull(5, java.sql.Types.DATE);
+                stmt.setNull(3, java.sql.Types.DATE);
             }
 
             stmt.setString(6, paciente.getTelefone());

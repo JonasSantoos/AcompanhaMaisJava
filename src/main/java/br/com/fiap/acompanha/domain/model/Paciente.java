@@ -1,6 +1,8 @@
 package br.com.fiap.acompanha.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 public class Paciente extends Pessoa{
@@ -13,7 +15,7 @@ public class Paciente extends Pessoa{
         super();
     }
 
-    public Paciente(Long idPessoa, String nome, String cpf, Date dataNascimento, char sexo,
+    public Paciente(Long idPessoa, String nome, String cpf, LocalDate dataNascimento, char sexo,
                     String telefone, String endereco, String especialidadeAtendimento, Long versao) {
 
         super(idPessoa, nome, cpf, dataNascimento, sexo, telefone, endereco, versao);

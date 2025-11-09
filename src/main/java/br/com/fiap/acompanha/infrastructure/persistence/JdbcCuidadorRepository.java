@@ -7,6 +7,7 @@ import br.com.fiap.acompanha.domain.repository.CuidadorRepository;
 import br.com.fiap.acompanha.infrastructure.exceptions.InfraestruturaException;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,16 +22,16 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
     @Override
     public Cuidador buscarPorId(Long id) throws EntidadeNaoLocalizada {
         String sql = """
-        SELECT 
-            c.id_cuidador, c.nm_cuidador, c.cpf_cuidador, c.dt_nascimento_cuidador,
-            c.sexo_cuidador, c.tel_cuidador, c.email_cuidador, c.senha_cuidador,
-            c.VERSION,
-            e.id_endereco, e.rua, e.numero, e.complemento, e.bairro, e.cidade, e.estado, e.cep
-        FROM ACPH_CUIDADOR c
-        LEFT JOIN ACPH_CUIDADOR_ENDERECO ce ON c.id_cuidador = ce.ACPH_CUIDADOR_ID_CUIDADOR
-        LEFT JOIN ACPH_ENDERECO e ON ce.ACPH_ENDERECO_ID_ENDERECO = e.id_endereco
-        WHERE c.id_cuidador = ?
-        """;
+    SELECT 
+        c.id_cuidador, c.nm_cuidador, c.cpf_cuidador, c.dt_nascimento_cuidador,
+        c.sexo_cuidador, c.tel_cuidador, c.email_cuidador, c.senha_cuidador,
+        c.VERSION,
+        e.id_endereco, e.rua, e.numero, e.complemento, e.bairro, e.cidade, e.estado, e.cep
+    FROM ACPH_CUIDADOR c
+    LEFT JOIN ACPH_CUIDADOR_ENDERECO ce ON c.id_cuidador = ce.ACPH_CUIDADOR_ID_CUIDADOR
+    LEFT JOIN ACPH_ENDERECO e ON ce.ACPH_ENDERECO_ID_ENDERECO = e.id_endereco
+    WHERE c.id_cuidador = ?
+    """;
 
         try (Connection conn = this.databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -52,8 +53,13 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
 
                 String endereco = construirEnderecoCompleto(resultSet);
 
+                LocalDate dataNascimentoLocalDate = null;
+                if (dataNascimento != null) {
+                    dataNascimentoLocalDate = dataNascimento.toLocalDate();
+                }
+
                 return new Cuidador(
-                        idPessoa, nome, cpfFromDB, dataNascimento, sexo,
+                        idPessoa, nome, cpfFromDB, dataNascimentoLocalDate, sexo,
                         telefone, endereco, email, senha, versao
                 );
             }
@@ -68,16 +74,16 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
     @Override
     public Cuidador buscarPorCpf(String cpf) throws EntidadeNaoLocalizada {
         String sql = """
-    SELECT
-        c.id_cuidador, c.nm_cuidador, c.cpf_cuidador, c.dt_nascimento_cuidador,
-        c.sexo_cuidador, c.tel_cuidador, c.email_cuidador, c.senha_cuidador,
-        c.VERSION,
-        e.id_endereco, e.rua, e.numero, e.complemento, e.bairro, e.cidade, e.estado, e.cep
-    FROM ACPH_CUIDADOR c
-    LEFT JOIN ACPH_CUIDADOR_ENDERECO ce ON c.id_cuidador = ce.ACPH_CUIDADOR_ID_CUIDADOR
-    LEFT JOIN ACPH_ENDERECO e ON ce.ACPH_ENDERECO_ID_ENDERECO = e.id_endereco
-    WHERE c.cpf_cuidador = ?
-    """;
+SELECT
+    c.id_cuidador, c.nm_cuidador, c.cpf_cuidador, c.dt_nascimento_cuidador,
+    c.sexo_cuidador, c.tel_cuidador, c.email_cuidador, c.senha_cuidador,
+    c.VERSION,
+    e.id_endereco, e.rua, e.numero, e.complemento, e.bairro, e.cidade, e.estado, e.cep
+FROM ACPH_CUIDADOR c
+LEFT JOIN ACPH_CUIDADOR_ENDERECO ce ON c.id_cuidador = ce.ACPH_CUIDADOR_ID_CUIDADOR
+LEFT JOIN ACPH_ENDERECO e ON ce.ACPH_ENDERECO_ID_ENDERECO = e.id_endereco
+WHERE c.cpf_cuidador = ?
+""";
 
         try (Connection conn = this.databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -99,8 +105,13 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
 
                 String endereco = construirEnderecoCompleto(resultSet);
 
+                LocalDate dataNascimentoLocalDate = null;
+                if (dataNascimento != null) {
+                    dataNascimentoLocalDate = dataNascimento.toLocalDate();
+                }
+
                 Cuidador cuidador = new Cuidador(
-                        idPessoa, nome, cpfFromDB, dataNascimento, sexo,
+                        idPessoa, nome, cpfFromDB, dataNascimentoLocalDate, sexo,
                         telefone, endereco, email, senha, versao
                 );
 
@@ -119,15 +130,15 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
 
     private List<Paciente> buscarPacientesPorCuidador(Long idCuidador) {
         String sql = """
-    SELECT
-        P.ID_PACIENTE, P.NM_PACIENTE, P.CPF_PACIENTE, P.DT_NASCIMENTO_PACIENTE,
-        P.SEXO_PACIENTE, P.TEL_PACIENTE, P.ESPECIALIDADE_ATENDIMENTO, P.VERSION,
-        E.RUA, E.NUMERO, E.COMPLEMENTO, E.BAIRRO, E.CIDADE, E.ESTADO, E.CEP
-    FROM ACPH_PACIENTE P
-    LEFT JOIN ACPH_PACIENTE_ENDERECO PE ON P.ID_PACIENTE = PE.ACPH_PACIENTE_ID_PACIENTE
-    LEFT JOIN ACPH_ENDERECO E ON PE.ACPH_ENDERECO_ID_ENDERECO = E.ID_ENDERECO
-    WHERE P.ACPH_CUIDADOR_ID_CUIDADOR = ?
-    """;
+SELECT
+    P.ID_PACIENTE, P.NM_PACIENTE, P.CPF_PACIENTE, P.DT_NASCIMENTO_PACIENTE,
+    P.SEXO_PACIENTE, P.TEL_PACIENTE, P.ESPECIALIDADE_ATENDIMENTO, P.VERSION,
+    E.RUA, E.NUMERO, E.COMPLEMENTO, E.BAIRRO, E.CIDADE, E.ESTADO, E.CEP
+FROM ACPH_PACIENTE P
+LEFT JOIN ACPH_PACIENTE_ENDERECO PE ON P.ID_PACIENTE = PE.ACPH_PACIENTE_ID_PACIENTE
+LEFT JOIN ACPH_ENDERECO E ON PE.ACPH_ENDERECO_ID_ENDERECO = E.ID_ENDERECO
+WHERE P.ACPH_CUIDADOR_ID_CUIDADOR = ?
+""";
 
         try (Connection conn = this.databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -141,7 +152,7 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
                 Long idPessoa = resultSet.getLong("ID_PACIENTE");
                 String nome = resultSet.getString("NM_PACIENTE");
                 String cpf = resultSet.getString("CPF_PACIENTE");
-                Date dataNascimento = resultSet.getDate("DT_NASCIMENTO_PACIENTE");
+                java.sql.Date dataNascimento = resultSet.getDate("DT_NASCIMENTO_PACIENTE");
                 String sexoStr = resultSet.getString("SEXO_PACIENTE");
                 char sexo = (sexoStr != null && !sexoStr.isEmpty()) ? sexoStr.charAt(0) : ' ';
                 String telefone = resultSet.getString("TEL_PACIENTE");
@@ -150,8 +161,14 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
 
                 String endereco = construirEnderecoCompleto(resultSet);
 
+                // CONVERTER java.sql.Date para LocalDate
+                LocalDate dataNascimentoLocalDate = null;
+                if (dataNascimento != null) {
+                    dataNascimentoLocalDate = dataNascimento.toLocalDate();
+                }
+
                 Paciente paciente = new Paciente(
-                        idPessoa, nome, cpf, dataNascimento, sexo, telefone,
+                        idPessoa, nome, cpf, dataNascimentoLocalDate, sexo, telefone,
                         endereco, especialidadeAtendimento, versao
                 );
 
@@ -182,8 +199,8 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
             stmt.setString(2, String.valueOf(cuidador.getSexo()));
 
             if (cuidador.getDataNascimento() != null) {
-                java.util.Date utilDate = cuidador.getDataNascimento();
-                java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+                cuidador.setDataNascimento(cuidador.getDataNascimento());
+                java.sql.Date sqlDate = java.sql.Date.valueOf(cuidador.getDataNascimento());
                 stmt.setDate(3, sqlDate);
             } else {
                 stmt.setNull(3, java.sql.Types.DATE);
@@ -317,16 +334,16 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
     @Override
     public Cuidador buscarPorEmail(String email) throws EntidadeNaoLocalizada {
         String sql = """
-    SELECT
-        c.id_cuidador, c.nm_cuidador, c.cpf_cuidador, c.dt_nascimento_cuidador,
-        c.sexo_cuidador, c.tel_cuidador, c.email_cuidador, c.senha_cuidador,
-        c.VERSION,
-        e.id_endereco, e.rua, e.numero, e.complemento, e.bairro, e.cidade, e.estado, e.cep
-    FROM ACPH_CUIDADOR c
-    LEFT JOIN ACPH_CUIDADOR_ENDERECO ce ON c.id_cuidador = ce.ACPH_CUIDADOR_ID_CUIDADOR
-    LEFT JOIN ACPH_ENDERECO e ON ce.ACPH_ENDERECO_ID_ENDERECO = e.id_endereco
-    WHERE c.email_cuidador = ?
-    """;
+SELECT
+    c.id_cuidador, c.nm_cuidador, c.cpf_cuidador, c.dt_nascimento_cuidador,
+    c.sexo_cuidador, c.tel_cuidador, c.email_cuidador, c.senha_cuidador,
+    c.VERSION,
+    e.id_endereco, e.rua, e.numero, e.complemento, e.bairro, e.cidade, e.estado, e.cep
+FROM ACPH_CUIDADOR c
+LEFT JOIN ACPH_CUIDADOR_ENDERECO ce ON c.id_cuidador = ce.ACPH_CUIDADOR_ID_CUIDADOR
+LEFT JOIN ACPH_ENDERECO e ON ce.ACPH_ENDERECO_ID_ENDERECO = e.id_endereco
+WHERE c.email_cuidador = ?
+""";
 
         try (Connection conn = this.databaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -348,8 +365,14 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
 
                 String endereco = construirEnderecoCompleto(resultSet);
 
+                // CONVERTER java.sql.Date para LocalDate
+                LocalDate dataNascimentoLocalDate = null;
+                if (dataNascimento != null) {
+                    dataNascimentoLocalDate = dataNascimento.toLocalDate();
+                }
+
                 Cuidador cuidador = new Cuidador(
-                        idPessoa, nome, cpf, dataNascimento, sexo,
+                        idPessoa, nome, cpf, dataNascimentoLocalDate, sexo,
                         telefone, endereco, emailFromDB, senha, versao
                 );
 
@@ -667,11 +690,11 @@ public class JdbcCuidadorRepository implements CuidadorRepository {
             stmt.setString(4, cuidador.getCpf());
 
             if (cuidador.getDataNascimento() != null) {
-                java.util.Date utilDate = cuidador.getDataNascimento();
-                java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-                stmt.setDate(5, sqlDate);
+                cuidador.setDataNascimento(cuidador.getDataNascimento());
+                java.sql.Date sqlDate = java.sql.Date.valueOf(cuidador.getDataNascimento());
+                stmt.setDate(3, sqlDate);
             } else {
-                stmt.setNull(5, java.sql.Types.DATE);
+                stmt.setNull(3, java.sql.Types.DATE);
             }
 
             stmt.setString(6, cuidador.getTelefone());

@@ -3,6 +3,7 @@ package br.com.fiap.acompanha.domain.model;
 import br.com.fiap.acompanha.domain.exceptions.ValidacaoDominioException;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public abstract class Pessoa {
@@ -10,16 +11,13 @@ public abstract class Pessoa {
     private Long idPessoa;
     private String nome;
     private String cpf;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private Date dataNascimento;
-
+    private LocalDate dataNascimento;
     private char sexo;
     private String telefone;
     private String endereco;
     private Long versao;
 
-    public Pessoa(Long idPessoa, String nome, String cpf, Date dataNascimento, char sexo, String telefone, String endereco, Long versao) {
+    public Pessoa(Long idPessoa, String nome, String cpf, LocalDate dataNascimento, char sexo, String telefone, String endereco, Long versao) {
         this.idPessoa = idPessoa;
         this.nome = nome;
         setCpf(cpf);
@@ -30,7 +28,7 @@ public abstract class Pessoa {
         this.versao = versao;
     }
 
-    public Pessoa(Long idPessoa, String nome, String cpf, Date dataNascimento, char sexo, String telefone, Long versao) {
+    public Pessoa(Long idPessoa, String nome, String cpf, LocalDate dataNascimento, char sexo, String telefone, Long versao) {
         this.idPessoa = idPessoa;
         this.nome = nome;
         setCpf(cpf);
@@ -91,7 +89,7 @@ public abstract class Pessoa {
         return cpf;
     }
 
-    public Date getDataNascimento() {
+    public LocalDate getDataNascimento() {
         return dataNascimento;
     }
 
@@ -115,7 +113,7 @@ public abstract class Pessoa {
         this.nome = nome;
     }
 
-    public void setDataNascimento(Date dataNascimento) {
+    public void setDataNascimento(LocalDate dataNascimento) {
         this.dataNascimento = dataNascimento;
     }
 

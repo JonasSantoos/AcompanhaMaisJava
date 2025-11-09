@@ -3,6 +3,7 @@ package br.com.fiap.acompanha.domain.model;
 import br.com.fiap.acompanha.domain.exceptions.EntidadeNaoLocalizada;
 import br.com.fiap.acompanha.domain.repository.CuidadorRepository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -16,13 +17,13 @@ public class Cuidador extends Pessoa{
         super();
     }
 
-    public Cuidador(Long idPessoa, String nome, String cpf, Date dataNascimento, char sexo, String telefone, String endereco, String email, String senha, Long versao) {
+    public Cuidador(Long idPessoa, String nome, String cpf, LocalDate dataNascimento, char sexo, String telefone, String endereco, String email, String senha, Long versao) {
         super(idPessoa, nome, cpf, dataNascimento, sexo, telefone, endereco, versao);
         this.email = email;
         this.senha = senha;
     }
 
-    public Cuidador(Long idPessoa, String nome, String cpf, Date dataNascimento, char sexo, String telefone, String email, String senha, Long versao) {
+    public Cuidador(Long idPessoa, String nome, String cpf, LocalDate dataNascimento, char sexo, String telefone, String email, String senha, Long versao) {
         super(idPessoa, nome, cpf, dataNascimento, sexo, telefone, versao);
         this.email = email;
         this.senha = senha;
